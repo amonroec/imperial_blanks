@@ -1,0 +1,56 @@
+.card {
+  box-shadow: 0 8px 8px rgba(0, 0, 0, 0.05);
+
+  &.postsCard{
+  	// background-color:#e0e0e0 !important;
+  }
+  // background-color:#d9d9d9 !important;
+
+  .card-header {
+		/*background-image: linear-gradient(to right, #FBFBFB , rgba(62, 222, 75, .5));*/
+	}
+
+	&.smallCard {
+
+		.card-header {
+			text-align:center;
+			background-image: none;
+			background-color: #e0e0e0;
+		}
+
+		border: 1px solid #000;
+	}
+
+	&.topRates {
+
+		.card-header {
+			text-align:center;
+			background-image: none;
+			background-color: grey;
+			text-shadow: 1px 1px #3ab54a;
+			color:#fff;
+			font-size:25px;
+		}
+
+		.table {
+			tbody {
+
+				tr {
+					&:hover {
+						background-color:#e0e0e0;
+					}
+
+					td {
+						text-align:center;
+					}
+				}
+			}
+			th {
+				text-align: center;
+			}
+		}
+	}
+}
+
+
+

@@ -1,0 +1,71 @@
+@import 'variables';
+@import '~bootstrap/scss/bootstrap';
+@import '~sweetalert2/src/sweetalert2';
+@import '~dropify/dist/css/dropify.css';
+/*@import '~fontawesome/scss/fontawesome.scss';
+@import '~fontawesome/scss/solid.scss';
+@import '~fontawesome/scss/brands.scss';*/
+
+@import 'elements/card';
+@import 'elements/navbar';
+@import 'elements/buttons';
+@import 'elements/transitions';
+@import 'table';
+@import '~vue-select/src/scss/vue-select.scss';
+
+/*html {
+	background-color:#000;
+}
+*/
+/*.main-layout {
+	background-color: #000 !important;
+}*/
+
+.vs__selected {
+	font-size:12px !important;
+}
+.upload_image_form__thumbnails {
+	min-height:200px;
+	height:auto;
+	background-color:#e6e6e6;
+}
+
+.dontShow {
+	display: none !important;
+}
+
+.close {
+	color: #fff !important;
+}
+.next {
+	color: #fff !important;
+}
+.prev {
+	color: #fff !important;
+}
+
+.coolText {
+	text-shadow: 1px 1px #3ab54a;
+	color:#000;
+	font-size:25px;
+}
+
+.dropzone-area {
+	width: auto;
+	min-height:300px !important;
+	height: auto !important;
+
+	.dropzone-img {
+
+		span {
+			width:calc(100% - 9px) !important;
+		}
+	}
+
+	.dropzone-preview {
+		position:relative !important;
+		width:100%;
+	    height: auto;
+		padding-top: 40px;
+	}
+}
