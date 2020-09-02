@@ -34,7 +34,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/getFilterData', 'InventoryController@getFilterData');
     Route::post('/testApi', 'InventoryController@testApi');
 
-    Route::post('/sendInventory', 'InventoryController@sendInventory');
+    //Route::post('/sendInventory', 'InventoryController@sendInventory');
 
 // ORDERS CONTROLLER ROUTES
     Route::post('/submitOrder', 'OrdersController@submitOrder');
@@ -49,6 +49,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/confirmUser', 'UsersController@confirmUser');
 
 });
+
+Route::post('/sendInventory', 'InventoryController@sendInventory');
 
 
 //GUEST ROUTES WILL BE PLACED HERE
