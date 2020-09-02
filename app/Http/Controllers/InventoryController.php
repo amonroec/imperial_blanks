@@ -9,17 +9,17 @@ class InventoryController extends Controller
 {
 
     public function sendInventory(Request $request) {
-        // $data = $request->all();
+        $data = $request->all();
 
-        // foreach($data as $out) {
-        //     $res = new Inventory();
-        //     $res->style = $out['NWSTY'];
-        //     $res->color_code = $out['NWCLR'];
-        //     $res->sequence = $out['NWSEQ'];
-        //     $res->quantity = $out['NWVAL'];
-        //     $res->size = $out['NWSIZE'];
-        //     $res->save();
-        // }
+        foreach($data as $out) {
+            $res = new Inventory();
+            $res->style = $out['NWSTY'];
+            $res->color_code = $out['NWCLR'];
+            $res->sequence = $out['NWSEQ'];
+            $res->quantity = $out['NWVAL'];
+            $res->size = $out['NWSIZE'];
+            $res->save();
+        }
         return 'success';
     }
 
