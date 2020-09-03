@@ -16,7 +16,7 @@ class InventoryController extends Controller
             $res->style = $out['NWSTY'];
             $res->color_code = $out['NWCLR'];
             $res->sequence = $out['NWSEQ'];
-            $res->quantity = $out['NWVAL'];
+            $res->quantity = $out['NWAVL'];
             $res->size = $out['NWSIZE'];
             $res->save();
         }
