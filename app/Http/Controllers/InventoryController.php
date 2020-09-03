@@ -20,7 +20,7 @@ class InventoryController extends Controller
             $res->size = $out['NWSIZE'];
             $res->save();
         }
-        return 'success';
+        return json_encode($data);
     }
 
     public function getInventory(Request $request) {
