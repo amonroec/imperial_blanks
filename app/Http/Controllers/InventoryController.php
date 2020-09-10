@@ -10,11 +10,12 @@ class InventoryController extends Controller
 
     public function sendInventory(Request $request) {
         $data = $request->all();
-
+        $r = Inventory::truncate();
         foreach($data as $out) {
             $res = new Inventory();
             $res->style = $out['NWSTY'];
             $res->color_code = $out['NWCLR'];
+            $res->color = $out['NWCDSC'];
             $res->sequence = $out['NWSEQ'];
             $res->quantity = $out['NWAVL'];
             $res->size = $out['NWSIZE'];
@@ -38,34 +39,26 @@ class InventoryController extends Controller
 
         if (count($styles) > 0 && count($colors) > 0) {
             $res = Inventory::select()
-                        ->where('customer_number', $user['customer_number'])
-                        ->where('customer_number', '<>', '')
-                        ->whereIn('customer_color', $colors)
-                        ->whereIn('booking_style', $styles)
+                        ->whereIn('color_code', $colors)
+                        ->whereIn('style', $styles)
                         ->offset($request->offset)
                         ->limit($request->limit)
                         ->get();
         } else if (count($styles) > 0 && count($colors) < 1) {
             $res = Inventory::select()
-                        ->where('customer_number', $user['customer_number'])
-                        ->where('customer_number', '<>', '')
-                        ->whereIn('booking_style', $styles)
+                        ->whereIn('style', $styles)
                         ->offset($request->offset)
                         ->limit($request->limit)
                         ->get();
         } else if (count($styles) < 1 && count($colors) > 0) {
             $res = Inventory::select()
-                        ->where('customer_number', $user['customer_number'])
-                        ->where('customer_number', '<>', '')
-                        ->whereIn('customer_color', $colors)
+                        ->whereIn('color_code', $colors)
                         ->offset($request->offset)
                         ->limit($request->limit)
                         ->get();
         } else {
             $res = Inventory::select()
-                        ->where('customer_number', $user['customer_number'])
-                        ->where('customer_number', '<>', '')
-                        ->orderBy('customer_style', 'ASC')
+                        ->orderBy('style', 'ASC')
                         ->offset($request->offset)
                         ->limit($request->limit)
                         ->get();
@@ -89,26 +82,24 @@ class InventoryController extends Controller
     public function getFilters(Request $request) {
         $user = $request->user;
 
-        $res = Inventory::select('customer_color')
-                        ->where('customer_number', $user['customer_number'])
-                        ->groupBy('customer_color')
-                        ->orderBy('customer_color', 'ASC')
+        $res = Inventory::select('color_code')
+                        ->groupBy('color_code')
+                        ->orderBy('color_code', 'ASC')
                         ->get();
 
         $colors = [];
         foreach($res as $out) {
-            array_push($colors, $out['customer_color']);
+            array_push($colors, $out['color_code']);
         }
 
-        $res2 = Inventory::select('booking_style')
-                        ->where('customer_number', $user['customer_number'])
-                        ->groupBy('booking_style')
-                        ->orderBy('booking_style', 'ASC')
+        $res2 = Inventory::select('style')
+                        ->groupBy('style')
+                        ->orderBy('style', 'ASC')
                         ->get();
 
         $styles = [];
         foreach($res2 as $out) {
-            array_push($styles, $out['booking_style']);
+            array_push($styles, $out['style']);
         }
         return compact('colors', 'styles');
     }
