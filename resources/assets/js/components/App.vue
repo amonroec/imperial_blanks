@@ -40,7 +40,7 @@ export default {
 
     return {
       title: 'Imperial',
-      titleTemplate: `%s · Stock`
+      titleTemplate: `%s · Blank Stock`
     }
   },
 
