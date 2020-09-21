@@ -22,7 +22,7 @@ class InventoryController extends Controller
         }
         foreach($data as $out) {
             $name = $out['NWSTY'];
-            if ($obj->$name) {
+            if (isset($obj->$name)) {
                 $res = new Inventory();
                 $res->style = $out['NWSTY'];
                 $res->color_code = $out['NWCLR'];
