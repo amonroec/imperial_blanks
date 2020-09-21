@@ -24,6 +24,9 @@ class Inventory extends Model
     	'oo_units',
     	'total_available',
     	'our_price',
-    	'retail_price'
+    	'retail_price',
+        'tags'
     ];
+
+    protected $casts = ['tags' => 'array'];
 }

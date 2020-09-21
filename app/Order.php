@@ -19,6 +19,10 @@ class Order extends Model
 		'user_email',
 		'user_id',
 		'customer_number',
-		'status'
+		'status',
+		'sold_to',
+		'payment_type',
+		'stripe_id'
     ];
+    protected $casts = ['sold_to' => 'object', 'ship_to' => 'object'];
 }

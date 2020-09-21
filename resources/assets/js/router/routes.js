@@ -13,6 +13,7 @@ const AdminIndex = () => import('~/pages/admin/admin_index').then(m => m.default
 const UsersTable = () => import('~/pages/admin/users_table').then(m => m.default || m)
 const ConfirmUser = () => import('~/pages/admin/confirm_user').then(m => m.default || m)
 const InventoryPage = () => import('~/pages/inventory_page').then(m => m.default || m)
+const NewInventoryPage = () => import('~/pages/new_inventory_page').then(m => m.default || m)
 const Checkout = () => import('~/pages/checkout').then(m => m.default || m)
 const OrderSummary = () => import('~/pages/order_summary').then(m => m.default || m)
 const OrderDisplay = () => import('~/pages/order_display').then(m => m.default || m)
@@ -28,6 +29,7 @@ export default [
 
   { path: '/login', name: 'login', component: Login },
   { path: '/inventory_page', name: 'inventory_page', component: InventoryPage },
+  { path: '/new_inventory_page', name: 'new_inventory_page', component: NewInventoryPage },
   { path: '/order_summary/:token', name: 'order_summary', component: OrderSummary, props: true },
   { path: '/order_display/:token', name: 'order_display', component: OrderDisplay, props: true },
   { path: '/checkout', name: 'checkout', component: Checkout },

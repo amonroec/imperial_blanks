@@ -29,6 +29,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 // INVENTORY CONTROLLER ROUTES
     Route::post('/getInventory', 'InventoryController@getInventory');
+    Route::post('/getNewInventory', 'InventoryController@getNewInventory');
     Route::post('/searchSku', 'InventoryController@searchSku');
     Route::post('/getFilters', 'InventoryController@getFilters');
     Route::post('/getFilterData', 'InventoryController@getFilterData');

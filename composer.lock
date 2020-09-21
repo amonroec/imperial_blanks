@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6eb2d37184b56a8508f718e756968876",
+    "content-hash": "cd1e82cc75c3781473fd51e154385c01",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -588,6 +588,7 @@
                     "homepage": "http://www.acci.cz"
                 }
             ],
+            "abandoned": "php-parallel-lint/php-console-color",
             "time": "2014-04-08T15:00:19+00:00"
         },
         {
@@ -632,6 +633,7 @@
                     "homepage": "http://www.acci.cz/"
                 }
             ],
+            "abandoned": "php-parallel-lint/php-console-highlighter",
             "time": "2015-04-20T18:58:01+00:00"
         },
         {
@@ -1743,28 +1745,30 @@
         },
         {
             "name": "stripe/stripe-php",
-            "version": "v6.23.0",
+            "version": "v7.52.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "54520402a78f76676c82261d9193e60e79d7fbbf"
+                "reference": "51e95c514aff45616dff09791ca5b2f10cf5c4e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/54520402a78f76676c82261d9193e60e79d7fbbf",
-                "reference": "54520402a78f76676c82261d9193e60e79d7fbbf",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/51e95c514aff45616dff09791ca5b2f10cf5c4e8",
+                "reference": "51e95c514aff45616dff09791ca5b2f10cf5c4e8",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-json": "*",
                 "ext-mbstring": "*",
-                "php": ">=5.4.0"
+                "php": ">=5.6.0"
             },
             "require-dev": {
-                "php-coveralls/php-coveralls": "1.*",
-                "phpunit/phpunit": "~4.0",
-                "squizlabs/php_codesniffer": "~2.0"
+                "friendsofphp/php-cs-fixer": "2.16.1",
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^5.7",
+                "squizlabs/php_codesniffer": "^3.3",
+                "symfony/process": "~3.4"
             },
             "type": "library",
             "extra": {
@@ -1794,7 +1798,7 @@
                 "payment processing",
                 "stripe"
             ],
-            "time": "2018-11-27T13:00:22+00:00"
+            "time": "2020-09-08T19:29:20+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -4806,5 +4810,6 @@
     "platform": {
         "php": "^7.1.3"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

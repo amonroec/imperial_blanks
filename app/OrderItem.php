@@ -8,9 +8,9 @@ class OrderItem extends Model
 {
     protected $fillable = [
     	'order_id',
-			'pai_style',
-			'pai_color',
-			'pai_variation',
+			'style',
+			'color',
+			'color_code',
 			'sku',
 			'customer_color',
 			'size',

@@ -15,9 +15,9 @@
                     <table id="fanaticsTable" class="table table-striped table-bordered" >
                         <thead>
                             <tr>
-                                <th>Sku</th>
+                                <!-- <th>Sku</th> -->
                                 <th>Style</th>
-                                <th>Var</th>
+                                <th>Color</th>
                                 <!-- <th style="text-align:center;width:75px;">XS</th>
                                 <th style="text-align:center;width:75px;">S</th>
                                 <th style="text-align:center;width:75px;">M</th>
@@ -27,7 +27,7 @@
                                 <th style="text-align:center;width:75px;">3X</th>
                                 <th style="text-align:center;width:75px;">4X</th>
                                 <th style="text-align:center;width:75px;">5X</th> -->
-                                <th>Color</th>
+                                <th>Color Code</th>
                                 <th style="text-align:center;">Size</th>
                                 <th style="text-align:center;width:100px;">Quantity</th>
                                 <th style="text-align:center;">Unit Price</th>
@@ -37,10 +37,10 @@
                         </thead>
                         <tbody>
                             <tr v-for="(value, key) in actual_orders">
-                                <td>{{value.customer_style}}</td>
-                                <td>{{value.booking_style}}</td>
-                                <td>{{value.booking_color}}</td>
-                                <td>{{value.pai_color}}</td>
+                                <!-- <td>{{value.customer_style}}</td> -->
+                                <td>{{value.style}}</td>
+                                <td>{{value.color}}</td>
+                                <td>{{value.color_code}}</td>
                                 <td style="text-align:center;">
                                     <!-- <div v-for="size in value.sizes" v-if="size.subtract_quantity !== ''" style="width:100px;float:left;">
                                         <div style="width:100%;float:left;text-align:center;">
@@ -56,13 +56,23 @@
                                     <!-- {{value.subtract_quantity}} -->
                                     <input type="number" v-model="value.quantity_ordered" @change="quantityChanged(value)" class="form-control" />
                                 </td>
-                                <td style="text-align:center;">{{value.retail_price}}</td>
-                                <td style="text-align:center;">{{value.total_price}}</td>
+                                <td style="text-align:center;">${{value.unit_price}}</td>
+                                <td style="text-align:center;">${{value.total_price}}</td>
                                 <td style="width:50px;">
                                     <button type="button" class="btn impButton" tooltip="Delete" @click="remove(value, key)">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 </td>
+                            </tr>
+                            <tr>
+                                <td>Totals</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="text-align:center;">{{configureTotalQuantity()}}</td>
+                                <td></td>
+                                <td style="text-align:center;">${{configureTotalPrice()}}</td>
+                                <td></td>
                             </tr>
                         </tbody>
                     </table>
@@ -73,61 +83,78 @@
             <card v-if="actual_orders">
                 <div class="col-12 float-left">
                     <!-- <h4 style="width:100%;">Click on the address  that you would like to use</h4> -->
-                    <label class="control-label col-md-3" for="text">User:</label>
-                    <ul>
+                    <div style="width:100%;float:left;">
+                        <label class="control-label col-md-3" for="text">Sold To:</label>
+                        <ul class="addressList mb-3">
+                            <li>
+
+                                <div style="width:100%;float:left;margin-top:15px;">
+                                    <input type="text" class="form-control" v-model="order_details.sold_to.name" placeholder="Ship To" />
+                                    <input type="text" style="margin-top:5px;" class="form-control" v-model="order_details.sold_to.address" placeholder="Address" />
+                                    <input type="text" style="margin-top:5px;width:50%;float:left;" class="form-control" v-model="order_details.sold_to.city" placeholder="City" />
+                                    <input type="text" style="margin-top:5px;width:25%;float:left;" class="form-control" v-model="order_details.sold_to.state" placeholder="State (Abr)" />
+                                    <input type="text" style="margin-top:5px;width:25%;float:left;" class="form-control" v-model="order_details.sold_to.zip_code" placeholder="Zip Code" />
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- <ul>
                         <li>
                             {{user.name}}
                         </li>
                         <li>
-                            <!-- <input type="email" v-model="user.email" class="form-control" /> -->
+                            <input type="email" v-model="user.email" class="form-control" />
                             {{user.email}}
                         </li>
-                    </ul>
-                    <label class="control-label col-md-3" for="text">Ship To:</label>
-                    <ul class="addressList">
-                        <!-- <li>{{$store.state.user.company}}</li> -->
-                        <!-- <li style="padding-top:10px;">
-                            <select class="form-control" v-model="selectedAddress">
-                                <option v-for="i in 3" v-if="$store.state.user['address_' + i]" :value="i">{{$store.state.user['address_' + i].nickname}}</option>
-                                <option :value="4">Other</option>
-                            </select>
-                        </li> -->
-                        <!-- <li style="padding-top:15px;">
-                            {{typeAddress.ship_to}}<br />
-                            {{typeAddress.address}}<br />
-                            {{typeAddress.city}}, {{typeAddress.state}} {{typeAddress.zip_code}}
-                        </li> -->
-                        <li>
+                    </ul> -->
+                    <hr style="width:80%;float:left;margin-left:10%;margin-top:40px;height:1px;background-color:#ccc;" />
+                    <div style="width:100%;float:left;margin-top:15px;">
+                        <label class="control-label col-md-3" for="text">Ship To:</label>
+                        <ul class="addressList">
+                            <!-- <li>{{$store.state.user.company}}</li> -->
+                            <!-- <li style="padding-top:10px;">
+                                <select class="form-control" v-model="selectedAddress">
+                                    <option v-for="i in 3" v-if="$store.state.user['address_' + i]" :value="i">{{$store.state.user['address_' + i].nickname}}</option>
+                                    <option :value="4">Other</option>
+                                </select>
+                            </li> -->
+                            <!-- <li style="padding-top:15px;">
+                                {{typeAddress.ship_to}}<br />
+                                {{typeAddress.address}}<br />
+                                {{typeAddress.city}}, {{typeAddress.state}} {{typeAddress.zip_code}}
+                            </li> -->
+                            <li>
 
-                            <div style="width:100%;float:left;margin-top:15px;">
-                                <input type="text" class="form-control" v-model="typeAddress.ship_to" placeholder="Ship To" />
-                                <input type="text" style="margin-top:5px;" class="form-control" v-model="typeAddress.address" placeholder="Address" />
-                                <input type="text" style="margin-top:5px;width:50%;float:left;" class="form-control" v-model="typeAddress.city" placeholder="City" />
-                                <input type="text" style="margin-top:5px;width:25%;float:left;" class="form-control" v-model="typeAddress.state" placeholder="State (Abr)" />
-                                <input type="text" style="margin-top:5px;width:25%;float:left;" class="form-control" v-model="typeAddress.zip_code" placeholder="Zip Code" />
-                            </div>
-                        </li>
-                        <!-- <li @click="selectedAddress = '1'" v-if="$store.state.user.address_1" style="padding-top:15px;" :class="selectedAddress === '1' ? 'selected' : ''">
-                            <h4 style="width:100%;">Address 1</h4>
-                            {{$store.state.user.address_1.name}}<br />
-                            {{$store.state.user.address_1.address}}<br />
-                            {{$store.state.user.address_1.city}}, {{$store.state.user.address_1.state}} {{$store.state.user.address_1.zip_code}}
-                        </li>
-                        <li @click="selectedAddress = '2'" v-if="$store.state.user.address_2" style="padding-top:15px;" :class="selectedAddress === '2' ? 'selected' : ''">
-                            <h4 style="width:100%;">Address 2</h4>
-                            {{$store.state.user.address_2.name}}<br />
-                            {{$store.state.user.address_2.address}}<br />
-                            {{$store.state.user.address_2.city}}, {{$store.state.user.address_2.state}} {{$store.state.user.address_2.zip_code}}
-                        </li>
-                        <li @click="selectedAddress = '3'" v-if="$store.state.user.address_3" style="padding-top:15px;" :class="selectedAddress === '3' ? 'selected' : ''">
-                            <h4 style="width:100%;">Address 3</h4>
-                            {{$store.state.user.address_3.name}}<br />
-                            {{$store.state.user.address_3.address}}<br />
-                            {{$store.state.user.address_3.city}}, {{$store.state.user.address_3.state}} {{$store.state.user.address_3.zip_code}}
-                        </li> -->
-                        <!-- <li>{{$store.state.user.address_2}}</li>
-                        <li>{{$store.state.user.address_3}}</li> -->
-                    </ul>
+                                <div style="width:100%;float:left;margin-top:15px;">
+                                    <input type="text" class="form-control" v-model="order_details.ship_to.name" placeholder="Ship To" />
+                                    <input type="text" style="margin-top:5px;" class="form-control" v-model="order_details.ship_to.address" placeholder="Address" />
+                                    <input type="text" style="margin-top:5px;width:50%;float:left;" class="form-control" v-model="order_details.ship_to.city" placeholder="City" />
+                                    <input type="text" style="margin-top:5px;width:25%;float:left;" class="form-control" v-model="order_details.ship_to.state" placeholder="State (Abr)" />
+                                    <input type="text" style="margin-top:5px;width:25%;float:left;" class="form-control" v-model="order_details.ship_to.zip_code" placeholder="Zip Code" />
+                                </div>
+                            </li>
+                            <!-- <li @click="selectedAddress = '1'" v-if="$store.state.user.address_1" style="padding-top:15px;" :class="selectedAddress === '1' ? 'selected' : ''">
+                                <h4 style="width:100%;">Address 1</h4>
+                                {{$store.state.user.address_1.name}}<br />
+                                {{$store.state.user.address_1.address}}<br />
+                                {{$store.state.user.address_1.city}}, {{$store.state.user.address_1.state}} {{$store.state.user.address_1.zip_code}}
+                            </li>
+                            <li @click="selectedAddress = '2'" v-if="$store.state.user.address_2" style="padding-top:15px;" :class="selectedAddress === '2' ? 'selected' : ''">
+                                <h4 style="width:100%;">Address 2</h4>
+                                {{$store.state.user.address_2.name}}<br />
+                                {{$store.state.user.address_2.address}}<br />
+                                {{$store.state.user.address_2.city}}, {{$store.state.user.address_2.state}} {{$store.state.user.address_2.zip_code}}
+                            </li>
+                            <li @click="selectedAddress = '3'" v-if="$store.state.user.address_3" style="padding-top:15px;" :class="selectedAddress === '3' ? 'selected' : ''">
+                                <h4 style="width:100%;">Address 3</h4>
+                                {{$store.state.user.address_3.name}}<br />
+                                {{$store.state.user.address_3.address}}<br />
+                                {{$store.state.user.address_3.city}}, {{$store.state.user.address_3.state}} {{$store.state.user.address_3.zip_code}}
+                            </li> -->
+                            <!-- <li>{{$store.state.user.address_2}}</li>
+                            <li>{{$store.state.user.address_3}}</li> -->
+                        </ul>
+                    </div>
                     <!-- <ul class="addressList" v-else>
                         <li style="padding-top:15px;">
                             <input type="text" class="form-control" v-model="typeAddress.ship_to" placeholder="Ship To" />
@@ -137,12 +164,59 @@
                             <input type="text" style="margin-top:5px;width:25%;float:left;" class="form-control" v-model="typeAddress.zip_code" placeholder="Zip Code" />
                         </li>
                     </ul> -->
-                    <label class="control-label col-md-3" for="text">PO #:</label>
-                    <ul>
-                        <li>
-                            <input type="text" class="form-control" v-model="po_number" id="text" placeholder="Your PO">
-                        </li>
-                    </ul>
+                    <hr style="width:80%;float:left;margin-left:10%;margin-top:40px;height:1px;background-color:#ccc;" />
+                    <div style="width:100%;float:left;margin-top:15px;">
+                        <label class="control-label col-md-3" for="text">Order Details:</label>
+                        <ul>
+                            <li>
+                                <div style="width:100%;float:left;margin-top:15px;">
+                                    <input type="text" style="margin-top:5px;float:left;" class="form-control" v-model="order_details.po_number" placeholder="PO #" />
+                                    <br /><br />
+                                    Ship Date
+                                    <input type="date" style="margin-top:5px;float:left;" class="form-control" v-model="order_details.ship_date" placeholder="Ship Date" />
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <hr style="width:80%;float:left;margin-left:10%;margin-top:40px;height:1px;background-color:#ccc;" />
+                    <div style="width:100%;float:left;margin-top:15px;">
+                        <label class="control-label col-md-3" for="text">Event Details:</label>
+                        <ul>
+                            <li>
+                                <div style="width:100%;float:left;margin-top:15px;">
+                                    <button class="btn btn-sm btn-default" @click="order_details.event = 'Yes'" :class="order_details.event === 'Yes' ? 'btn-success' : ''">Yes</button>
+                                    <button class="btn btn-sm btn-default" @click="order_details.event = 'No'" :class="order_details.event === 'No' ? 'btn-success' : ''">No</button>
+                                    <br /><br />
+                                    <div style="width:100%;float:left;" v-if="order_details.event === 'Yes'">
+                                        Event Date
+                                        <div style="width:100%;float:left;margin-top:5px;">
+                                            <input type="date" class="form-control" v-model="order_details.event_date" placeholder="Event Date" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <hr style="width:80%;float:left;margin-left:10%;margin-top:40px;height:1px;background-color:#ccc;" />
+                    <div style="width:100%;float:left;margin-top:15px;">
+                        <label class="control-label col-md-3" for="text">Shipping Details:</label>
+                        <ul>
+                            <li>
+                                <div style="width:100%;float:left;margin-top:15px;">
+                                    <select class="form-control" v-model="order_details.ship_method">
+                                        <option value="">Select Ship Method</option>
+                                        <option v-for="val in shipping_options" :value="val">{{val}}</option>
+                                    </select>
+
+                                    <div style="width:100%;float:left;margin-top:5px;" v-if="order_details.ship_method !== 'Other' && order_details.ship_method !== ''">
+                                        <input type="text" class="form-control" v-model="order_details.ship_code" placeholder="Ship Code" />
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                     <!-- <label class="control-label col-md-3" for="text">In Hands Date:</label>
                     <ul>
                         <li>
@@ -150,8 +224,30 @@
                         </li>
                     </ul> -->
                 </div>
-                <div class="col-12 float-left text-center">
-                    <button v-if="!checkoutLoading" class="btn impButton" @click="completeOrder()">Complete Order</button>
+                <div class="col-12 float-left text-center mt-3">
+                    <!-- <button v-if="!checkoutLoading" class="btn impButton" @click="stripe_checkout()">Complete Order</button> -->
+                    <button v-if="!checkoutLoading && user.invoice" class="btn impButton" @click="completeOrder()">Invoice Order</button>
+                    <!-- <button v-else-if="!checkoutLoading && !user.invoice" class="btn impButton" @click="completeOrder()">Complete Order</button> -->
+                    <!-- <stripe-checkout
+                        ref="checkoutRef"
+                        :pk="publishableKey"
+                        :items="items"
+                        v-else-if="!checkoutLoading && !user.invoice">
+                        <template slot="checkout-button">
+                          <button @click="stripe_checkout()">Shut up and take my money!</button>
+                        </template>
+                    </stripe-checkout>
+                     -->
+                    <div style="width:100%;float:left;" v-else-if="!checkoutLoading && !user.invoice">
+                        <stripe-elements
+                            ref="elementsRef"
+                            :pk="publishableKey"
+                            :amount="configureAmount()"
+                            local="de"
+                            @token="tokenCreated"
+                            ></stripe-elements>
+                            <button class="btn impButton" @click="submit()">Complete Order</button>
+                    </div>
                     <small-loader v-else></small-loader>
                 </div>
             </card>
@@ -163,6 +259,12 @@ var methods = {}
 import swal from 'sweetalert2';
 import SmallLoader from './../components/small_loader'
 import { mapGetters } from 'vuex'
+import { StripeCheckout } from 'vue-stripe-checkout';
+import { StripeElements } from 'vue-stripe-checkout';
+
+methods.submit = function () {
+      this.$refs.elementsRef.submit();
+}
 
 methods.completeOrder = function () {
     // this.actual_orders.forEach(function (val) {
@@ -181,10 +283,10 @@ methods.completeOrder = function () {
     }
     const postData = {
         email: this.email,
-        address: this.typeAddress,
-        po_number: this.po_number,
         orders: this.actual_orders,
-        user: this.user
+        order_details: this.order_details,
+        user: this.user,
+        charge: this.charge
     }
     console.log(postData)
     axios.post('/api/submitOrder', postData).then(response => {
@@ -199,13 +301,59 @@ methods.completeOrder = function () {
     })
 }
 
+methods.tokenCreated = function (e) {
+    this.checkoutLoading = true
+    var description = this.user.name + ' purchase of ' + this.order_details.po_number + '.'
+    console.log(e)
+    this.charge = {
+        source: e.id,
+        amount: this.amount,
+        description: description
+    }
+    var that = this
+    setTimeout(function () {
+        that.completeOrder()
+    }, 1000)
+}
+
+methods.configureAmount = function () {
+    var total = 0
+    for (var key in this.actual_orders) {
+        // var obj = {
+        //     sku: 'sku_' + this.actual_orders[key].style + '_' + this.actual_orders[key].color_code,
+        //     quantity: this.actual_orders[key].quantity_ordered
+        // }
+        // this.items.push(obj)
+        total += parseFloat(this.actual_orders[key].total_price)
+    }
+    this.amount = parseFloat(total).toFixed(2)
+    this.amount = this.amount * 100
+    return this.amount
+}
+
+methods.configureTotalPrice = function () {
+    var total = 0
+    for (var key in this.actual_orders) {
+        total += parseFloat(this.actual_orders[key].total_price)
+    }
+    return parseFloat(total).toFixed(2)
+}
+
+methods.configureTotalQuantity = function () {
+    var total = 0
+    for (var key in this.actual_orders) {
+        total += parseInt(this.actual_orders[key].quantity_ordered)
+    }
+    return total
+}
+
 methods.quantityChanged = function (value) {
     console.log(value)
     var tot = 0
-    if (parseInt(value.quantity_ordered) > parseInt(value.available_units)) {
-        value.quantity_ordered = value.available_units
+    if (parseInt(value.quantity_ordered) > parseInt(value.quantity)) {
+        value.quantity_ordered = value.quantity
     }
-    tot = parseFloat(parseInt(value.quantity_ordered) * parseFloat(value.retail_price)).toFixed(2)
+    tot = parseFloat(parseInt(value.quantity_ordered) * parseFloat(value.unit_price)).toFixed(2)
     value.total_price = tot
     var arr = []
     for (var key in this.actual_orders) {
@@ -213,6 +361,21 @@ methods.quantityChanged = function (value) {
     }
     window.localStorage.setItem('cart', JSON.stringify(arr))
     // this.$store.dispatch('cart_details/setCart')
+}
+
+methods.stripe_checkout = function () {
+    this.items = []
+    for (var key in this.actual_orders) {
+        var obj = {
+            sku: 'sku_' + this.actual_orders[key].style + '_' + this.actual_orders[key].color_code,
+            quantity: this.actual_orders[key].quantity_ordered
+        }
+        this.items.push(obj)
+    }
+    var that = this
+    setTimeout(function () {
+        that.$refs.checkoutRef.redirectToCheckout();
+    }, 1000);
 }
 
 methods.remove = function (value, key) {
@@ -242,6 +405,19 @@ methods.remove = function (value, key) {
     
 }
 
+methods.getUnitPrice = function (val) {
+    var unitPrice = ''
+    var i = 0
+    var that = this
+    this.quant_arr.forEach(function (v) {
+        if (parseInt(val.quantity_ordered) < v && unitPrice === '') {
+            unitPrice = that.price_arr[i]
+        }
+        i++
+    })
+    return parseFloat(unitPrice).toFixed(2)
+}
+
 export default {
     // ===Component name
     name: "Checkout",
@@ -249,7 +425,9 @@ export default {
     // props: ['order'],
     // ===Components used by this component
     components: {
-        SmallLoader
+        SmallLoader,
+        StripeCheckout,
+        StripeElements
     },
     middleware: 'auth',
     // ====component Data properties
@@ -257,19 +435,38 @@ export default {
         return{
             order: null,
             actual_orders: null,
-            po_number: '',
             selectedAddress: null,
             in_hands_date: '',
             checkoutLoading: false,
+            publishableKey: "pk_test_zYHtIgvalM3NFNipQwqLjqIy",
             newAddress: false,
+            quant_arr: [5, 23, 47, 71, 143],
+            price_arr: [25.00, 15.20, 10.20, 9.80, 9.20],
             email: 'accountspayable@bandondunesgolf.com',
-            typeAddress: {
-                ship_to: '',
-                address: '',
-                city: '',
-                state: '',
-                zip_code: ''
+            charge: null,
+            order_details: {
+                ship_to: {
+                    name: '',
+                    address: '',
+                    city: '',
+                    state: '',
+                    zip_code: ''
+                },
+                sold_to: {
+                    name: '',
+                    address: '',
+                    city: '',
+                    state: '',
+                    zip_code: ''
+                },
+                po_number: '',
+                event: 'No',
+                ship_date: '',
+                ship_method: '',
+                ship_code: ''
             },
+            items: null,
+            shipping_options: ['UPS Ground', 'FEDEX Ground', 'UPS 2nd Day Air', 'UPS Overnight', 'FEDEX Express', 'Other'],
             addresses: null,
             addressOptions: null,
             otherAddressSelected: null,
@@ -281,35 +478,44 @@ export default {
     }),
     // ===Code to be executed when Component is mounted
     mounted() {
+        console.log(this.publishableKey)
         if (window.localStorage.getItem('cart')) {
             this.order = JSON.parse(window.localStorage.getItem('cart'))
             this.actual_orders = []
             var that = this
             var obj = {}
             var same = false
+            var quantArr = [5, 23, 47, 71, 143]
+            var priceArr = [25.00, 15.20, 10.20, 9.80, 9.20]
             this.order.forEach(function (val) {
-                if (!obj[val.sku]) {
-                    var totalPrice = parseFloat(parseInt(val.quantity_ordered) * parseFloat(val.retail_price)).toFixed(2)
-                    obj[val.customer_style] = {
-                        booking_style: val.booking_style,
-                        pai_color: val.pai_color,
-                        booking_color: val.booking_color,
-                        customer_style: val.customer_style,
-                        customer_color: val.customer_color,
+                console.log(val)
+                var str = val.style + '_' + val.color_code
+                console.log(str)
+                if (!obj[str]) {
+                    var unit_price = that.getUnitPrice(val)
+                    var totalPrice = parseFloat(parseInt(val.quantity_ordered) * parseFloat(unit_price)).toFixed(2)
+                    obj[str] = {
+                        style: val.style,
+                        color: val.color,
+                        color_code: val.color_code,
+                        // customer_style: val.customer_style,
+                        // customer_color: val.customer_color,
                         size: val.size,
                         retail_price: val.retail_price,
                         our_price: val.our_price,
+                        unit_price: unit_price,
                         quantity_ordered: val.quantity_ordered,
-                        available_units: val.available_units,
+                        available_units: val.quantity,
                         total_price: totalPrice
                     }
                 } else {
-                    obj[val.customer_style].quantity_ordered += val.quantity_ordered
-                    if (parseInt(obj[val.customer_style].quantity_ordered) > parseInt(obj[val.customer_style].available_units)) {
-                        obj[val.customer_style].quantity_ordered = obj[val.customer_style].available_units
+                    obj[str].quantity_ordered += val.quantity_ordered
+                    if (parseInt(obj[str].quantity_ordered) > parseInt(obj[str].available_units)) {
+                        obj[str].quantity_ordered = obj[str].available_units
                     }
-                    var totalPrice = parseFloat(parseInt(val.quantity_ordered) * parseFloat(val.retail_price)).toFixed(2)
-                    obj[val.customer_style].total_price = totalPrice
+                    var unit_price = that.getUnitPrice(obj)
+                    var totalPrice = parseFloat(parseInt(val.quantity_ordered) * parseFloat(unit_price)).toFixed(2)
+                    obj[str].total_price = totalPrice
                     same = true
                 }
                 
@@ -318,6 +524,7 @@ export default {
                 // }
                 // that.actual_orders.push(obj)
             })
+            console.log(obj)
             that.actual_orders = obj
             if (same) {
                 var arr = []
@@ -407,6 +614,7 @@ export default {
         height:30.75px;
         color:white;
         font-weight:bold;
+        line-height:15px;
 
         &:hover {
             background-color:#a91d21;

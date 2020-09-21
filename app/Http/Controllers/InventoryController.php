@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Inventory;
+use App\Tag;
 
 class InventoryController extends Controller
 {
@@ -11,7 +12,16 @@ class InventoryController extends Controller
     public function sendInventory(Request $request) {
         $data = $request->all();
         $r = Inventory::truncate();
+        $tags = Tag::all();
+        $obj = (object)[];
+        foreach($tags as $out) {
+            $name = $out['style'];
+            if (!isset($obj->$name)) {
+                $obj->$name = $out['tags'];
+            }
+        }
         foreach($data as $out) {
+            $name = $out['NWSTY'];
             $res = new Inventory();
             $res->style = $out['NWSTY'];
             $res->color_code = $out['NWCLR'];
@@ -19,6 +29,9 @@ class InventoryController extends Controller
             $res->sequence = $out['NWSEQ'];
             $res->quantity = $out['NWAVL'];
             $res->size = $out['NWSIZE'];
+            if (isset($obj->$name)) {
+                $res->tags = $obj->$name;
+            }
             $res->save();
         }
         return json_encode($data);
@@ -68,13 +81,61 @@ class InventoryController extends Controller
     	return $res;
     }
 
+    public function getNewInventory(Request $request) {
+        $user = $request->user;
+        $colors = $request->colors;
+        $styles = $request->styles;
+
+        if (count($styles) > 0 && count($colors) > 0) {
+            $res = Inventory::select('style')
+                        ->whereIn('color_code', $colors)
+                        ->whereIn('style', $styles)
+                        ->offset($request->offset)
+                        ->limit($request->limit)
+                        ->groupBy('style')
+                        ->get();
+        } else if (count($styles) > 0 && count($colors) < 1) {
+            $res = Inventory::select('style')
+                        ->whereIn('style', $styles)
+                        ->offset($request->offset)
+                        ->limit($request->limit)
+                        ->groupBy('style')
+                        ->get();
+        } else if (count($styles) < 1 && count($colors) > 0) {
+            $res = Inventory::select('style')
+                        ->whereIn('color_code', $colors)
+                        ->offset($request->offset)
+                        ->limit($request->limit)
+                        ->groupBy('style')
+                        ->get();
+        } else {
+            $res = Inventory::select('style')
+                        ->orderBy('style', 'ASC')
+                        ->offset($request->offset)
+                        ->limit($request->limit)
+                        ->groupBy('style')
+                        ->get();
+        }
+
+        $arr = [];
+        foreach($res as $out) {
+            array_push($arr, $out['style']);
+        }
+
+        $r = Inventory::select()
+                    ->whereIn('style', $arr)
+                    ->get();
+
+        return $r;
+    }
+
     public function searchSku(Request $request) {
         $search = $request->search;
         $user = $request->user;
 
         $res = Inventory::select()
-                        ->where('customer_number', $user['customer_number'])
-                        ->where('customer_style', $search)
+                        // ->where('customer_number', $user['customer_number'])
+                        ->where('style', $search)
                         ->get();
         return $res;
     }

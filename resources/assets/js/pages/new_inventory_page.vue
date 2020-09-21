@@ -17,31 +17,33 @@
                     <a style="margin-left:5px;">Hide Out of Stock</a>
                 </div>
                 <div class="searchBar" style="margin-bottom:10px;margin-top:15px;margin-left:15px;">
-                    <input type="input" class="form-control" style="padding-right:50px;" id="search" v-model="searchValue" placeholder="Find SKU...">
+                    <input type="input" class="form-control" style="padding-right:50px;" id="search" v-model="searchValue" placeholder="Find Style...">
                     <button type="button" @click="searchFunction()"  class="impButton impButtonColors btn" style="border-top-left-radius:0px;border-bottom-left-radius:0px;"><i class="fas fa-search"></i></button>
                 </div>
-                <v-select v-if="pai_styles" multiple style="margin-bottom:10px;width:246px;float:left;margin-top:15px;background-color:white;margin-left:15px;" placeholder="Filter By PAi Blank..." v-model="styleFilter" :options="pai_styles"></v-select>
+                <!-- <v-select v-if="pai_styles" multiple style="margin-bottom:10px;width:246px;float:left;margin-top:15px;background-color:white;margin-left:15px;" placeholder="Filter By PAi Blank..." v-model="styleFilter" :options="pai_styles"></v-select> -->
                 <v-select v-if="color_options" multiple style="margin-bottom:10px;width:246px;float:left;margin-top:15px;margin-left:15px;background-color:white;" placeholder="Filter By Color..." v-model="colorFilter" :options="color_options"></v-select>
                 <!-- <a>Showing items 1- of </a> -->
             </div>
         </div>
         <div class="d-block d-md-none" id="smallButtonWrapper"></div>
         <div id="bottomSection" class="d-none d-lg-block">
-            <div v-for="value in filterData" @click="orderShow(value)" v-if="!loading && (value.quantity>0 && hideZero || !hideZero)" style="cursor:pointer;" class="item col-sm-6 col-md-4 col-lg-3 float-left">
+            <div v-for="value in filterData" @click="orderShow(value)" v-if="!loading && (computeTotalQuantity(value)>0 && hideZero || !hideZero)" style="cursor:pointer;" class="item col-sm-6 col-md-4 col-lg-3 float-left">
                 <card class="itemWrap">
-                    <div class="topData">
-                        <span> SKU: <b>{{value.style}}</b> </span></br>
-                        <span> Color: <b>{{value.color}} ({{value.color_code}})</b> </span></br>
-                        <span> Size: <b>{{value.size}}</b> </span>
-                    </div>
+                    <!-- <div class="topData">
+                        <span> STYLE: <b>{{value[0].style}}</b> </span></br>
+                        <div style="width:100%;float:left;">
+                            <div style="width:20px;height:20px;float:left;margin:2px;" :style="'background-color:' + val.color + ';'" v-for="val in value" :title="val.color">
+                            </div>
+                        </div>
+                    </div> -->
                     <div style="padding-top:100%;"></div>
                     <div class="imgContainer">
-                        <!-- <img :src="'/storage/hat_images/' + value.customer_style + '.jpg'"></img> -->
+                        <img src="/storage/blank_default.jpg"></img>
                     </div>
                     <div class="price">
-                        <!-- Retail Price: ${{value.retail_price}}</br>
-                        Our Price: <b style="border-bottom:2px solid #C92227;">${{value.retail_price}}</b></br> -->
-                        Stock: <b>{{value.quantity}}</b>
+                        STYLE: <b style="border-bottom:2px solid #C92227;">{{value[0].style}}</b></br>
+                        Total Quantity: <b>{{computeTotalQuantity(value)}}</b></br>
+                        <!-- Stock: <b>{{value.quantity}}</b> -->
                     </div>
                 </card>
             </div>
@@ -58,21 +60,21 @@
             </div>
         </div>
         <div id="bottomSmallSection" class="d-block d-lg-none">
-            <div v-for="value in filterData" @click="orderShow(value)" v-if="!loading && (value.available_units>0 && hideZero || !hideZero)" style="cursor:pointer;" class="item col-sm-6 col-md-4 col-lg-3 float-left">
+            <div v-for="value in filterData" @click="orderShow(value)" v-if="!loading && (computeTotalQuantity(value)>0 && hideZero || !hideZero)" style="cursor:pointer;" class="item col-sm-6 col-md-4 col-lg-3 float-left">
                 <card class="itemWrap">
                     <div class="topData">
-                        <span> SKU: <b>{{value.style}}</b> </span></br>
-                        <span> Color: <b>{{value.color}} ({{value.color_code}})</b> </span></br>
-                        <span> Size: <b>{{value.size}}</b> </span>
+                        <span> SKU: <b>{{value[0].style}}</b> </span></br>
+                        <!-- <span> Color: <b>{{value.color}} ({{value.color_code}})</b> </span></br> -->
+                        <!-- <span> Size: <b>{{value.size}}</b> </span> -->
                     </div>
                     <div style="padding-top:100%;"></div>
                     <div class="imgContainer">
-                        <img :src="'/storage/hat_images/' + value.customer_style + '.jpg'"></img>
+                        <img :src="'/storage/hat_images/' + value[0].customer_style + '.jpg'"></img>
                     </div>
                     <div class="price">
-                        Retail Price: ${{value.retail_price}}</br>
-                        Our Price: <b style="border-bottom:2px solid #C92227;">${{value.retail_price}}</b></br>
-                        Stock: <b>{{value.quantity}}</b>
+                        Retail Price: ${{value[0].retail_price}}</br>
+                        Our Price: <b style="border-bottom:2px solid #C92227;">${{value[0].retail_price}}</b></br>
+                        <!-- Stock: <b>{{value.quantity}}</b> -->
                     </div>
                 </card>
             </div>
@@ -90,36 +92,52 @@
         </div>
         <div id="orderModal" class="modal fade" role="dialog">
           <div class="modal-dialog modal-lg">
-            <div v-if="currentOrder" class="modal-content modal-lg">
+            <div v-if="order_options" class="modal-content modal-lg">
               <div class="modal-header">
-                <h4 class="modal-title float-left">{{currentOrder.customer_style}}</h4>
+                <h4 class="modal-title float-left">{{currentOrder.style}}</h4>
                 <button type="button" class="close" data-dismiss="modal"><i class="fas fa-times" style="color:#000;line-height:36px;height:36px;"></i></button>
               </div>
               <div class="modal-body" style="width:100%;">
                 <div class="col-12 float-left text-center">
-                    <img style="max-height:500px;max-width:100%;" :src="'/storage/hat_images/' + currentOrder.customer_style + '.jpg'">
+                    <img style="max-height:300px;max-width:100%;" src="/storage/blank_default.jpg">
                 </div>
-                <div style="width:50%;height:24px;padding-right:5px;" class="float-left text-right">
-                    Color:
+                <div style="width:100%;float:left;padding:5px;">
+                    <div style="width:50%;padding-right:5px;" class="float-left text-right">
+                        Color:
+                    </div>
+                    <div style="width:50%;padding-left:5px;" class="float-left text-left">
+                        <select v-if="colorOptions" @change="colorChanged()" v-model="currentOrder.color_selected" class="form-control">
+                            <option value="">Select Color</option>
+                            <option :value="val" v-for="val in colorOptions">{{val.color}} (val.color_code)</option>
+                        </select>
+                    </div>
                 </div>
-                <div style="width:50%;height:24px;padding-left:5px;" class="float-left text-left">
-                    {{currentOrder.color}} ({{currentOrder.color_code}})
+                <div style="width:100%;float:left;padding:5px;">
+                    <div style="width:50%;padding-right:5px;" class="float-left text-right">
+                        Size:
+                    </div>
+                    <div style="width:50%;padding-left:5px;" class="float-left text-left">
+                        <select v-if="sizeOptions" @change="sizeChanged()" v-model="currentOrder.size" class="form-control">
+                            <option value="">Select Size</option>
+                            <option :value="val" v-for="val in sizeOptions">{{val}}</option>
+                        </select>
+                    </div>
                 </div>
-                <div style="width:50%;height:24px;padding-right:5px;" class="float-left text-right">
-                    Size:
+                <div style="width:100%;float:left;padding:5px;">
+                    <div style="width:50%;padding-right:5px;" class="float-left text-right">
+                        Available Units:
+                    </div>
+                    <div style="width:50%;padding-left:5px;" class="float-left text-left">
+                        {{currentOrder.quantity}}
+                    </div>
                 </div>
-                <div style="width:50%;height:24px;padding-left:5px;" class="float-left text-left">
-                    {{currentOrder.size}}
-                </div>
-                <div style="width:50%;height:24px;padding-right:5px;" class="float-left text-right">
-                    Available Units:
-                </div>
-                <div style="width:50%;height:24px;padding-left:5px;" class="float-left text-left">
-                    {{currentOrder.quantity}}
-                </div>
-                <div style="width:100%;margin-top:15px;float:left;text-align:center;">
-                    <a style="line-height:30.75px;">Order Quantity</a><br />
-                    <input type="number" class="form-control" :max="currentOrder.quantity" @keyup="checkQuantity()" placeholder="units" style="width:100px;text-align:center;margin-left:calc((100% - 100px)/2);" v-model="currentOrder.quantity_ordered" />
+                <div v-if="currentOrder.quantity" style="width:100%;margin-top:15px;float:left;text-align:center;">
+                    <div style="width:50%;padding-right:5px;" class="float-left text-right">
+                        Order Quantity:
+                    </div>
+                    <div style="width:50%;padding-left:5px;" class="float-left text-left">
+                        <input type="number" class="form-control" :max="currentOrder.quantity" @keyup="checkQuantity()" placeholder="units" style="width:100px;text-align:left;" v-model="currentOrder.quantity_ordered" />
+                    </div>
                 </div>
               </div>
               <div class="modal-footer">
@@ -145,10 +163,10 @@
                     <a style="margin-left:5px;">Hide Out of Stock</a>
                 </div>
                 <div class="searchBar" style="margin-bottom:10px;margin-top:15px;">
-                    <input type="input" class="form-control" style="padding-right:50px;" @keyup.enter="searchFunction()" id="search" v-model="searchValue" placeholder="Find SKU...">
+                    <input type="input" class="form-control" style="padding-right:50px;" @keyup.enter="searchFunction()" id="search" v-model="searchValue" placeholder="Find Style...">
                     <button type="button" @click="searchFunction()"  class="impButton impButtonColors btn" style="border-top-left-radius:0px;border-bottom-left-radius:0px;"><i class="fas fa-search"></i></button>
                 </div>
-                <v-select v-if="pai_styles" multiple style="margin-bottom:10px;width:246px;float:left;margin-top:15px;background-color:white;" placeholder="Filter By PAi Blank..." v-model="styleFilter" :options="pai_styles"></v-select>
+                <!-- <v-select v-if="pai_styles" multiple style="margin-bottom:10px;width:246px;float:left;margin-top:15px;background-color:white;" placeholder="Filter By PAi Blank..." v-model="styleFilter" :options="pai_styles"></v-select> -->
                 <v-select v-if="color_options" multiple style="margin-bottom:10px;width:246px;float:left;margin-top:15px;background-color:white;margin-bottom:20px;" placeholder="Filter By Color..." v-model="colorFilter" :options="color_options"></v-select>
               </div>
             </div>
@@ -171,34 +189,69 @@ methods.getInventory = function() {
         colors: this.colorFilter
     }
     console.log(postData)
-    axios.post('api/getInventory', postData).then(response => {
+    axios.post('api/getNewInventory', postData).then(response => {
         console.log(this.user)
         console.log(response);
+        // if (!this.data) {
+        //     this.data = response.data;
+        // } else if (this.oldOffset !== this.offset) {
+        //     this.oldOffset = this.offset
+        //     this.data = this.data.concat(response.data)
+        // } else {
+        //     this.data = response.data
+        // }
+        // this.filterData = this.data
+        // var arr = []
+        // var obj = {}
+        // var colorObj = {}
+        // var colorArr = []
+        // arr.sort()
+        // colorArr.sort()
+
         if (!this.data) {
-            this.data = response.data;
+            this.data = []
+            var obj = {}
+            response.data.forEach(function (val) {
+                if (!obj[val.style]) {
+                    obj[val.style] = []
+                }
+                obj[val.style].push(val)
+            })
+            var arr = []
+            for (var key in obj) {
+                arr.push(obj[key])
+            }
+            this.data = arr
+            console.log(this.data)
         } else if (this.oldOffset !== this.offset) {
-            this.oldOffset = this.offset
-            this.data = this.data.concat(response.data)
+            var obj = {}
+            response.data.forEach(function (val) {
+                if (!obj[val.style]) {
+                    obj[val.style] = []
+                }
+                obj[val.style].push(val)
+            })
+            var arr = []
+            for (var key in obj) {
+                arr.push(obj[key])
+            }
+            this.data = this.data.concat(arr)
         } else {
-            this.data = response.data
+            var obj = {}
+            response.data.forEach(function (val) {
+                if (!obj[val.style]) {
+                    obj[val.style] = []
+                }
+                obj[val.style].push(val)
+            })
+            var arr = []
+            for (var key in obj) {
+                arr.push(obj[key])
+            }
+            this.data = obj
         }
+        console.log(this.data)
         this.filterData = this.data
-        var arr = []
-        var obj = {}
-        var colorObj = {}
-        var colorArr = []
-        // this.data.forEach(function (val) {
-        //     if (!obj[val.customer_style] && val.available_units > 0) {
-        //         obj[val.customer_style] = val.customer_style
-        //         arr.push(val.customer_style)
-        //     }
-        //     if (!colorObj[val.customer_color] && val.available_units > 0) {
-        //         colorObj[val.customer_color] = val.customer_color
-        //         colorArr.push(val.customer_color)
-        //     }
-        // })
-        arr.sort()
-        colorArr.sort()
         // this.color_options = colorArr
         // this.pai_styles = arr
         this.loading = false
@@ -220,28 +273,71 @@ methods.getFilters = function () {
     })
 }
 
+methods.computeTotalQuantity = function (value) {
+    var total = 0
+    value.forEach(function (val) {
+        total += parseInt(val.quantity)
+    })
+    return total
+}
+
 methods.orderShow = function (value) {
-    var obj = {}
-    for (var key in value) {
-        obj[key] = value[key]
+    var arr = []
+    var arr2 = []
+    value.forEach(function (val) {
+        var obj = {
+            color: val.color,
+            color_code: val.color_code
+        }
+        arr.push(obj)
+        // arr2.push(val.size)
+    })
+    this.colorOptions = arr
+    // this.sizeOptions = arr2
+    var obj = {
+        id: '',
+        style: value[0].style,
+        color_code: '',
+        color: '',
+        color_selected: '',
+        // pai_variation: value.pai_variation,
+        // sku: value.sku,
+        // customer_color: '',
+        size: '',
+        // price: value.price,
+        // image: value.image,
+        quantity: '',
+        quantity_ordered: ''
     }
-    // var obj = {
-    //     id: value.id,
-    //     pai_style: value.pai_style,
-    //     pai_color: value.pai_color,
-    //     pai_variation: value.pai_variation,
-    //     sku: value.sku,
-    //     customer_color: value.customer_color,
-    //     size: value.size,
-    //     price: value.price,
-    //     image: value.image,
-    //     units: value.available_units,
-    //     quantity_ordered: ''
-    // }
-    obj.quantity_ordered = ''
+    // obj.quantity_ordered = ''
+    this.order_options = value
     this.currentOrder = obj
     // this.$refs.orderModal.show()
     $('#orderModal').modal('show')
+}
+
+methods.sizeChanged = function () {
+    var that = this
+    this.currentOrder.quantity = ''
+    this.order_options.forEach(function (val) {
+        if (val.color === that.currentOrder.color_selected.color && val.size === that.currentOrder.size) {
+            that.currentOrder.quantity = val.quantity
+            that.currentOrder.id = val.id
+        }
+    })
+}
+
+methods.colorChanged = function () {
+    var arr = []
+    var that = this
+    this.currentOrder.size = ''
+    this.currentOrder.quantity = ''
+    this.order_options.forEach(function (val) {
+        if (val.color === that.currentOrder.color_selected.color) {
+            arr.push(val.size)
+        }
+    })
+    this.sizeOptions = arr
 }
 
 methods.popupFilter = function () {
@@ -256,6 +352,8 @@ methods.loadMore = function () {
 
 methods.addToCart = function () {
     if (parseInt(this.currentOrder.quantity_ordered) && parseInt(this.currentOrder.quantity_ordered) > 0) {
+        this.currentOrder.color = this.currentOrder.color_selected.color
+        this.currentOrder.color_code = this.currentOrder.color_selected.color_code
         if (window.localStorage.getItem('cart')) {
             var cart = JSON.parse(window.localStorage.getItem('cart'))
             cart.push(this.currentOrder)
@@ -323,7 +421,19 @@ methods.searchFunction = function () {
         axios.post('/api/searchSku', postData).then(response => {
             if (response.status === 200) {
                 if (response.data.length) {
-                    this.filterData = response.data
+                    // this.filterData = response.data
+                    var obj = {}
+                    response.data.forEach(function (val) {
+                        if (!obj[val.style]) {
+                            obj[val.style] = []
+                        }
+                        obj[val.style].push(val)
+                    })
+                    var arr = []
+                    for (var key in obj) {
+                        arr.push(obj[key])
+                    }
+                    this.filterData = arr
                 } else {
                     swal('Not Found', 'The sku number you are trying to search could not be found.', 'error')
                 }
@@ -419,9 +529,12 @@ export default {
         return {
             data: null,
             hideZero: 1,
+            order_options: null,
             searchValue: '',
             styleFilter: [],
             colorFilter: [],
+            current_color: '',
+            current_size: '',
             filterData: null,
             loadedItems:0,
             totalItems:0,
@@ -434,7 +547,9 @@ export default {
             offset: 0,
             oldOffset: 0,
             limit: 25,
-            otherLoading: true
+            otherLoading: true,
+            colorOptions: null,
+            sizeOptions: null
         }
     },
     watch: {
@@ -462,27 +577,32 @@ export default {
             this.limit = 25
             this.getInventory()
         },
-        'hideZero': function () {
-            var obj = {}
-            var arr = []
-            if (this.hideZero) {
-                this.data.forEach(function (val) {
-                    if (!obj[val.customer_style] && val.available_units > 0) {
-                        obj[val.customer_style] = val.customer_style
-                        arr.push(val.customer_style)
-                    }
-                })
-            } else {
-                this.data.forEach(function (val) {
-                    if (!obj[val.customer_style]) {
-                        obj[val.customer_style] = val.customer_style
-                        arr.push(val.customer_style)
-                    }
-                })
-            }
-            arr.sort()
-            this.pai_styles = arr
-        },
+        // 'hideZero': function () {
+        //     var obj = {}
+        //     var arr = []
+        //     var that = this
+        //     if (this.hideZero) {
+        //         this.data.forEach(function (val) {
+        //             // if (!obj[val.customer_style] && val.available_units > 0) {
+        //             //     obj[val.customer_style] = val.customer_style
+        //             //     arr.push(val.customer_style)
+        //             // }
+        //             if (that.computeTotalQuantity(val) > 0) {
+        //                 arr.push(val[0].style)
+        //             }
+        //         })
+        //     } else {
+        //         this.data.forEach(function (val) {
+        //             // if (!obj[val.customer_style]) {
+        //             //     obj[val.customer_style] = val.customer_style
+        //             //     arr.push(val.customer_style)
+        //             // }
+        //             arr.push(val[0].style)
+        //         })
+        //     }
+        //     arr.sort()
+        //     this.pai_styles = arr
+        // },
         'colorFilter': function () {
             // var arr = []
             // if (this.colorFilter === '' || this.colorFilter === null || !this.colorFilter.length) {
@@ -498,6 +618,7 @@ export default {
             //         this.configureBoth()
             //     }
             // }
+
             this.offset = 0
             this.limit = 25
             this.getInventory()
@@ -605,7 +726,7 @@ export default {
         position:absolute;
         bottom:0;
         right:0;
-        height: 75px;
+        height: 60px;
         text-align:center;
         line-height:25px;
         width:150px;

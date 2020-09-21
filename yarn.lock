@@ -5921,6 +5921,13 @@ p-try@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-1.0.0.tgz#cbc79cdbaf8fd4228e13f621f2b1a237c1b207b3"
 
+package-lock-only@0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/package-lock-only/-/package-lock-only-0.0.4.tgz#5cf4f379d54d0f3d18d50c92e54d92e177f2f754"
+  integrity sha512-fV1YHeTMWH5LKmdVqfWskm2/SG0iF2IrxJn3ziaPVx9CnpecGJzt8xXtLV+CYINENZwPFMtbxO5qupz0asNz1A==
+  dependencies:
+    chalk "^2.4.1"
+
 pako@~1.0.5:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.6.tgz#0101211baa70c4bca4a0f63f2206e97b7dfaf258"
@@ -8312,9 +8319,12 @@ vue-select@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/vue-select/-/vue-select-3.1.0.tgz#ccebbc17e48f1e3be5f082224a0c45ceb07b8551"
 
-vue-stripe-checkout@^1.2.6:
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/vue-stripe-checkout/-/vue-stripe-checkout-1.2.6.tgz#01f6818fd2cb4b2e91a862ed77ede0df0d412139"
+vue-stripe-checkout@^3.5.7:
+  version "3.5.7"
+  resolved "https://registry.yarnpkg.com/vue-stripe-checkout/-/vue-stripe-checkout-3.5.7.tgz#cd5e880ad9ccee7a493ef6bea2254a17d0f7c303"
+  integrity sha512-lJoSd7RR1ffSwcqQClYqY1gHuHD0BFPXFnmYTJgDPke+Rtn697REHPytIZEKpjQavQZAZglEu3er2060Egfjlw==
+  dependencies:
+    package-lock-only "0.0.4"
 
 vue-stripe-elements-plus@^0.2.10:
   version "0.2.10"
