@@ -17,6 +17,12 @@
               </router-link>
             </li>
 
+            <li class="nav-item" v-if="user && user.confirmed">
+              <router-link :to="{ name: 'new_inventory_page' }" class="dropdown-item">
+                New Inventory
+              </router-link>
+            </li>
+
             <li class="nav-item" v-if="user && user.confirmed && user.admin">
               <router-link :to="{ name: 'orders_table' }" class="dropdown-item">
                 Orders
