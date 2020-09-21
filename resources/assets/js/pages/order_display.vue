@@ -24,22 +24,39 @@
                         <label class="labelLabel">Email:</label> <label class="valueLabel">{{data.email}}</label>
                     </div>
                     <div class="labels" style="width:100%;float:left;">
-                        <label class="labelLabel">Address:</label>
-                        <label class="valueLabel">{{data.ship_to || ''}}<br />
-                        {{data.address}}<br />
-                        {{data.city}}, {{data.state}} {{data.zip_code}}</label>
+                        <label class="labelLabel">Sold To:</label>
+                        <label class="valueLabel">{{data.sold_to.name || ''}}<br />
+                        {{data.sold_to.address}}<br />
+                        {{data.sold_to.city}}, {{data.sold_to.state}} {{data.sold_to.zip_code}}</label>
                     </div>
-                    <br />
                     <div class="labels" style="width:100%;float:left;">
-                        <label class="labelLabel">Status:</label> <label class="valueLabel">{{data.status}}</label>
+                        <label class="labelLabel">Ship To:</label>
+                        <label class="valueLabel">{{data.ship_to.name || ''}}<br />
+                        {{data.ship_to.address}}<br />
+                        {{data.ship_to.city}}, {{data.ship_to.state}} {{data.ship_to.zip_code}}</label>
+                    </div>
+                    <div class="labels" style="width:100%;float:left;">
+                        <label class="labelLabel">Shipping Method:</label><label class="valueLabel">{{data.ship_method}}</label>
+                    </div>
+                    <div class="labels" style="width:100%;float:left;">
+                        <label class="labelLabel">Shipping Code:</label><label class="valueLabel">{{data.ship_code}}</label>
+                    </div>
+                    <div class="labels" style="width:100%;float:left;">
+                        <label class="labelLabel">Ship Date:</label> <label class="valueLabel">{{data.ship_date}}</label>
+                    </div>
+                    <div class="labels" style="width:100%;float:left;">
+                        <label class="labelLabel">Event?:</label><label class="valueLabel">{{data.event}}</label>
+                    </div>
+                    <div class="labels" style="width:100%;float:left;" v-if="data.event === 'Yes'">
+                        <label class="labelLabel">Event Date:</label><label class="valueLabel">{{data.event_date}}</label>
                     </div>
                 </div>
                 <table id="fanaticsTable" class="table table-striped table-bordered" >
                     <thead>
                         <tr>
-                            <th>Sku</th>
-                            <th>Comp</th>
+                            <th>Style</th>
                             <th>Color</th>
+                            <th>Color Code</th>
                             <!-- <th>Size Type</th> -->
                             <th style="text-align:center;">Sizes</th>
                             <!-- <th>Sleeve</th> -->
@@ -52,9 +69,9 @@
                     </thead>
                     <tbody>
                         <tr v-for="val in data.items">
-                            <td>{{val.customer_style}}</td>
-                            <td>{{val.pai_style}}</td>
-                            <td>{{val.customer_color}}</td>
+                            <td>{{val.style}}</td>
+                            <td>{{val.color}}</td>
+                            <td>{{val.color_code}}</td>
                             <!-- <td>{{value.size_type}}</td> -->
                             <td style="text-align: center;">{{val.size}}</td>
                             <!-- <td>{{value.sleeve_type}}</td> -->
@@ -64,6 +81,15 @@
                             <td style="text-align:center;">{{val.unit_price}}</td>
                             <td style="text-align:center;">{{val.total_price}}</td>
                         </tr>
+                        <tr>
+                                <td>Totals</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="text-align:center;">{{configureTotalQuantity()}}</td>
+                                <td></td>
+                                <td style="text-align:center;">${{configureTotalPrice()}}</td>
+                            </tr>
                     </tbody>
                 </table>
 
@@ -108,6 +134,22 @@ methods.changeStatus = function (status) {
             this.data.status = response.data.status
         }
     })
+}
+
+methods.configureTotalPrice = function () {
+    var total = 0
+    this.data.items.forEach(function (val) {
+        total += parseFloat(val.total_price)
+    })
+    return parseFloat(total).toFixed(2)
+}
+
+methods.configureTotalQuantity = function () {
+    var total = 0
+    this.data.items.forEach(function (val) {
+        total += parseFloat(val.quantity_ordered)
+    })
+    return total
 }
 
 export default {
