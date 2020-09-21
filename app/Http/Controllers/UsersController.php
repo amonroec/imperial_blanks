@@ -95,7 +95,7 @@ class UsersController extends Controller
     public function confirmUser(Request $request) {
         $user = $request->user;
         $res = User::find($user['id']);
-        $res->customer_number = $user['customer_number'];
+        // $res->customer_number = $user['customer_number'];
         $res->confirmed = 1;
         $res->save();
 

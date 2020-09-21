@@ -23,9 +23,6 @@
                         <td>
                             <input type="text" disabled v-model="value.email" class="form-control" />
                         </td>
-                        <td>
-                            <input type="text" disabled v-model="value.customer_number" class="form-control" />
-                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -57,7 +54,7 @@
                     </div>
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-success" :disabled="configureDisabled()" data-dismiss="modal" @click="saveUser()">Confirm User & Send Email</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" @click="saveUser()">Confirm User & Send Email</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                   </div>
                 </div>
@@ -97,11 +94,11 @@ methods.saveUser = function () {
 }
 
 methods.configureDisabled = function () {
-    if (this.editUser.customer_number) {
-        return false
-    } else {
-        return true
-    }
+    // if (this.editUser.customer_number) {
+    //     return false
+    // } else {
+    //     return true
+    // }
 }
 
 export default {
