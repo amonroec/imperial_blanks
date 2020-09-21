@@ -22,17 +22,19 @@ class InventoryController extends Controller
         }
         foreach($data as $out) {
             $name = $out['NWSTY'];
-            $res = new Inventory();
-            $res->style = $out['NWSTY'];
-            $res->color_code = $out['NWCLR'];
-            $res->color = $out['NWCDSC'];
-            $res->sequence = $out['NWSEQ'];
-            $res->quantity = $out['NWAVL'];
-            $res->size = $out['NWSIZE'];
-            if (isset($obj->$name)) {
-                $res->tags = $obj->$name;
+            if ($obj->$name) {
+                $res = new Inventory();
+                $res->style = $out['NWSTY'];
+                $res->color_code = $out['NWCLR'];
+                $res->color = $out['NWCDSC'];
+                $res->sequence = $out['NWSEQ'];
+                $res->quantity = $out['NWAVL'];
+                $res->size = $out['NWSIZE'];
+                if (isset($obj->$name)) {
+                    $res->tags = $obj->$name;
+                }
+                $res->save();
             }
-            $res->save();
         }
         return json_encode($data);
     }
