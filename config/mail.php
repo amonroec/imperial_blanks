@@ -57,7 +57,7 @@ return [
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'noreply@paivms.com'),
-        'name' => env('MAIL_FROM_NAME', 'ImperialStock'),
+        'name' => env('MAIL_FROM_NAME', 'ImperialBlanks'),
     ],
 
     /*
