@@ -43,6 +43,7 @@ class InventoryController extends Controller
     	$user = $request->user;
         $colors = $request->colors;
         $styles = $request->styles;
+        $tags = $request->tagFilter;
 
     	// $res = Inventory::select()
     	// 				->where('customer_number', $user['customer_number'])
@@ -52,26 +53,47 @@ class InventoryController extends Controller
     	// 				->limit($request->limit)
     	// 				->get();
 
-        if (count($styles) > 0 && count($colors) > 0) {
+        if (count($styles) > 0 && count($colors) > 0 && count($tags) > 0) {
             $res = Inventory::select()
                         ->whereIn('color_code', $colors)
+                        ->whereIn('style', $styles)
+                        ->whereLike('tags', '%' . $tags . '%')
+                        ->offset($request->offset)
+                        ->limit($request->limit)
+                        ->get();
+        } else if (count($styles) > 0 && count($colors) < 1 && count($tags) < 1) {
+            $res = Inventory::select()
                         ->whereIn('style', $styles)
                         ->offset($request->offset)
                         ->limit($request->limit)
                         ->get();
-        } else if (count($styles) > 0 && count($colors) < 1) {
-            $res = Inventory::select()
-                        ->whereIn('style', $styles)
-                        ->offset($request->offset)
-                        ->limit($request->limit)
-                        ->get();
-        } else if (count($styles) < 1 && count($colors) > 0) {
+        } else if (count($styles) < 1 && count($colors) > 0 && count($tags) < 1) {
             $res = Inventory::select()
                         ->whereIn('color_code', $colors)
                         ->offset($request->offset)
                         ->limit($request->limit)
                         ->get();
-        } else {
+        } else if (count($styles) < 1 && count($colors) > 0 && count($tags) > 0) {
+            $res = Inventory::select()
+                        ->whereIn('color_code', $colors)
+                        ->whereLike('tags', '%' . $tags . '%')
+                        ->offset($request->offset)
+                        ->limit($request->limit)
+                        ->get();
+        } else if (count($styles) < 1 && count($colors) < 1 && count($tags) > 0) {
+            $res = Inventory::select()
+                        ->offset($request->offset)
+                        ->limit($request->limit)
+                        ->get();
+
+            $arr = [];
+            foreach($res as $out) {
+                if (!empty(array_intersect($out['tags'], $tags))) {
+                    array_push($arr, $out);
+                }
+            }
+            $res = $arr;
+        }else {
             $res = Inventory::select()
                         ->orderBy('style', 'ASC')
                         ->offset($request->offset)
@@ -87,41 +109,51 @@ class InventoryController extends Controller
         $user = $request->user;
         $colors = $request->colors;
         $styles = $request->styles;
+        $tags = $request->tagFilter;
 
         if (count($styles) > 0 && count($colors) > 0) {
-            $res = Inventory::select('style')
+            $res = Inventory::select('style', 'tags')
                         ->whereIn('color_code', $colors)
                         ->whereIn('style', $styles)
                         ->offset($request->offset)
                         ->limit($request->limit)
-                        ->groupBy('style')
+                        ->groupBy('style', 'tags')
                         ->get();
         } else if (count($styles) > 0 && count($colors) < 1) {
-            $res = Inventory::select('style')
+            $res = Inventory::select('style', 'tags')
                         ->whereIn('style', $styles)
                         ->offset($request->offset)
                         ->limit($request->limit)
-                        ->groupBy('style')
+                        ->groupBy('style', 'tags')
                         ->get();
         } else if (count($styles) < 1 && count($colors) > 0) {
-            $res = Inventory::select('style')
+            $res = Inventory::select('style', 'tags')
                         ->whereIn('color_code', $colors)
                         ->offset($request->offset)
                         ->limit($request->limit)
-                        ->groupBy('style')
+                        ->groupBy('style', 'tags')
                         ->get();
         } else {
-            $res = Inventory::select('style')
+            $res = Inventory::select('style', 'tags')
                         ->orderBy('style', 'ASC')
                         ->offset($request->offset)
                         ->limit($request->limit)
-                        ->groupBy('style')
+                        ->groupBy('style', 'tags')
                         ->get();
         }
 
         $arr = [];
-        foreach($res as $out) {
-            array_push($arr, $out['style']);
+        if (count($tags) > 0) {
+            foreach($res as $out) {
+                // array_push($arr, $out['style']);
+                if (!empty(array_intersect($out['tags'], $tags))) {
+                    array_push($arr, $out['style']);
+                }
+            }
+        } else {
+            foreach($res as $out) {
+                array_push($arr, $out['style']);
+            }
         }
 
         $r = Inventory::select()

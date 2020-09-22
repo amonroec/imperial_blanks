@@ -22,6 +22,15 @@
                 </div>
                 <!-- <v-select v-if="pai_styles" multiple style="margin-bottom:10px;width:246px;float:left;margin-top:15px;background-color:white;margin-left:15px;" placeholder="Filter By PAi Blank..." v-model="styleFilter" :options="pai_styles"></v-select> -->
                 <v-select v-if="color_options" multiple style="margin-bottom:10px;width:246px;float:left;margin-top:15px;margin-left:15px;background-color:white;" placeholder="Filter By Color..." v-model="colorFilter" :options="color_options"></v-select>
+                <!-- <div style="width:100%;float:left;">
+                    <label>Tags</label>
+                    <button
+                        class="btn btn-sm"
+                        :class="tags.indexOf(val) > -1 ? 'btn-danger' : 'btn-default'"
+                        @click="tagClicked(val)"
+                        v-for="val in tags">{{val}}</button>
+                </div> -->
+                <v-select v-if="tags" multiple style="margin-bottom:10px;width:246px;float:left;margin-top:15px;background-color:white;margin-left:15px;" placeholder="Filter By Tags..." v-model="tagFilter" :options="tags"></v-select>
                 <!-- <a>Showing items 1- of </a> -->
             </div>
         </div>
@@ -186,7 +195,8 @@ methods.getInventory = function() {
         offset: this.offset,
         limit: this.limit,
         styles: this.styleFilter,
-        colors: this.colorFilter
+        colors: this.colorFilter,
+        tagFilter: this.tagFilter
     }
     console.log(postData)
     axios.post('api/getNewInventory', postData).then(response => {
@@ -207,7 +217,7 @@ methods.getInventory = function() {
         // var colorArr = []
         // arr.sort()
         // colorArr.sort()
-
+        var tags = []
         if (!this.data) {
             this.data = []
             var obj = {}
@@ -215,8 +225,16 @@ methods.getInventory = function() {
                 if (!obj[val.style]) {
                     obj[val.style] = []
                 }
+                if (val.tags) {
+                    val.tags.forEach(function (tag) {
+                        if (tags.indexOf(tag) < 0) {
+                            tags.push(tag)
+                        }
+                    })
+                }
                 obj[val.style].push(val)
             })
+            this.tags = tags
             var arr = []
             for (var key in obj) {
                 arr.push(obj[key])
@@ -257,6 +275,14 @@ methods.getInventory = function() {
         this.loading = false
         this.otherLoading = false
     })
+}
+
+methods.tagClicked = function (val) {
+    if (this.tags.indexOf(val) > -1) {
+        this.tags.splice(this.tags.indexOf(val), 1)
+    } else {
+        this.tags.push(val)
+    }
 }
 
 methods.getFilters = function () {
@@ -549,7 +575,9 @@ export default {
             limit: 25,
             otherLoading: true,
             colorOptions: null,
-            sizeOptions: null
+            sizeOptions: null,
+            tags: [],
+            tagFilter: ''
         }
     },
     watch: {
@@ -557,6 +585,13 @@ export default {
             if (this.searchValue === '') {
                 this.filterData = this.data
             }
+        },
+        'tagFilter': function () {
+            // if (this.tags.length) {
+                this.offset = 0
+                this.limit = 25
+                this.getInventory()
+            // }
         },
         'styleFilter': function () {
             // var arr = []

@@ -459,6 +459,7 @@ export default {
                     state: '',
                     zip_code: ''
                 },
+                event_date: '',
                 po_number: '',
                 event: 'No',
                 ship_date: '',
