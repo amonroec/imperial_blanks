@@ -577,7 +577,7 @@ export default {
             colorOptions: null,
             sizeOptions: null,
             tags: [],
-            tagFilter: ''
+            tagFilter: []
         }
     },
     watch: {
